@@ -16,19 +16,9 @@ import time
 
 #let's start the script. for function to select link id with ssl, copy it to Output.csv and print it
 
-y = (V66722216, A-08663619, A91853838)
+y = ("V66722216", "A-08663619", "A91853838")
 
 for x in y: #range of ids
-	x=x+1
-	url = "https://secretaria.icas.es:444/web/ColegiadoBusquedaColegiado.aspx?id=" + str(x)	
-	s = requests.Session() #ssl session
-	s.mount(url, SSLAdapter(ssl.PROTOCOL_TLSv1)) # ojo al protocolo ssl
-	r = requests.get(url, verify=False)	#verificar aunque el cert no es valido
-	f = open("Output.csv", "a")		 #append to csv
-	f.write('\n'+url+",") #new line url comma
-	f.close()	
-	print url
-#print soup.prettify()
 
 	url = "http://www.cnmv.es/Portal/Consultas/Folletos/FolletosEmisionOPV.aspx?nif=" + str(x)	
 	s = requests.Session() #ssl session
@@ -36,24 +26,37 @@ for x in y: #range of ids
 	r = requests.get(url, verify=False)	#verificar aunque el cert no es valido
 	f = open(str(x+".csv"), "a")		 #append to csv
 	f.write('\n'+url+",") #new line url comma
+	f = open(str(x+".sh"), "a")		 #append to csv
+	f.write('#!/bin/bash' + '\n') #start sh
 	f.close()	
 	print url #print soup.prettify() #see the html
 #script to scrap the soup, filter it, copy it in Output.csv and print
-	soup = BeautifulSoup(r.content)	
-	for titulo in soup.find_all("<span id="ctl00_ContentPrincipal_lblSubtitulo">"):
+        soup = BeautifulSoup(r.content)	
+	for titulo in soup.find_all("span", {'id' : 'ctl00_ContentPrincipal_lblSubtitulo'}):
 		strtitulo = str(titulo)
+		tit = strtitulo[47:]
+		tit2 = re.sub("</span>", "", tit)
+		strtit = str(tit2)
 		f = open(str(x+".csv"), "a")		 #append to csv to read with excel later
-		f.write(titulo)
+		f.write(strtitulo)
 		f.close()
-		print titulo
-	for scrap in soup.find_all("http://www.cnmv.es/Portal/verDoc.axd?t={*}"):
+		print strtit
+	for scrap in soup.find_all('a',  {'href': re.compile('verDoc.axd.*?}')}):
 		strscrap = str(scrap)
- 		a=re.sub("http://www.cnmv.es/Portal/verDoc.axd?t={*}","",strscrap)
+		a=re.sub('<a href="../../verDoc.axd','<a href="http://www.cnmv.es/Portal/verDoc.axd',strscrap)
+		stra = str(a)
+		b = stra[9:86]
+		strb = str(b)
 		f = open(str(x+".csv"), "a")		 #append to csv to read with excel later
-		f.write(strscrap)
+		f.write(strb)
 		f.close()
-		print strscrap
-	if x % 120 == 0:
+		print strb
+
+		strb = 'wget ' + str(b) + '\n'
+		f = open(str(x+".sh"), "a")		 #append to csv to read with excel later
+		f.write(strb)
+		f.close()
+		print strb
 		time.sleep(1.5)
 
 	#	for line in strscrap:
