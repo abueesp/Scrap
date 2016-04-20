@@ -16,11 +16,11 @@ import time
 
 #let's start the script. for function to select link id with ssl, copy it to Output.csv and print it
 
-y = ("V66722216", "A-08663619", "A91853838")
+y = ("ni1", "ni2", "ni3")
 
 for x in y: #range of ids
 
-	url = "http://www.cnmv.es/Portal/Consultas/Folletos/FolletosEmisionOPV.aspx?nif=" + str(x)	
+	url = "http://www.ALGO.es/Portal/Consultas/Folletos/FolletosNARANJASOPV.aspx?nif=" + str(x)	
 	s = requests.Session() #ssl session
 	s.mount(url, SSLAdapter(ssl.PROTOCOL_TLSv1)) # ojo al protocolo ssl
 	r = requests.get(url, verify=False)	#verificar aunque el cert no es valido
@@ -43,7 +43,7 @@ for x in y: #range of ids
 		print strtit
 	for scrap in soup.find_all('a',  {'href': re.compile('verDoc.axd.*?}')}):
 		strscrap = str(scrap)
-		a=re.sub('<a href="../../verDoc.axd','<a href="http://www.cnmv.es/Portal/verDoc.axd',strscrap)
+		a=re.sub('<a href="../../verDoc.axd','<a href="http://www.ALGO.es/Portal/verDoc.axd',strscrap)
 		stra = str(a)
 		b = stra[9:86]
 		strb = str(b)
